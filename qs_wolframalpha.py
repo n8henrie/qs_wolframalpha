@@ -4,9 +4,16 @@ Takes a query from [Quicksilver](https://qsapp.com) and gets it from the
 Wolfram Alpha API, returns it to Quicksilver.
 """
 
-import requests
 import xml.etree.ElementTree as etree
 import sys
+
+try:
+    from urllib.parse import urlencode
+    from urllib.request import urlopen
+except ImportError:
+    # Python2
+    from urllib import urlencode
+    from urllib2 import urlopen
 
 def main(appid, query):
 
@@ -18,8 +25,8 @@ def main(appid, query):
         'async': 'true',
         'reinterpret': 'true'
     }
-    resp = requests.get(api_root + "query", params=payload)
-    tree = etree.fromstring(resp.text)
+    resp = urlopen(api_root + "query?" + urlencode(payload))
+    tree = etree.fromstring(resp.read())
 
     try:
         # Return first subpod's plaintext
